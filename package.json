@@ -14,13 +14,13 @@
   ],
   "license": "MIT",
   "author": "snowfoxHQ",
-  "homepage": "https://github.com/snowfoxHQ/vecRecall-plugin",
+  "homepage": "https://github.com/snowfoxHQ/dsh-vecrecall",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/snowfoxHQ/vecRecall-plugin.git"
+    "url": "git+https://github.com/snowfoxHQ/dsh-vecrecall.git"
   },
   "bugs": {
-    "url": "https://github.com/snowfoxHQ/vecRecall-plugin/issues"
+    "url": "https://github.com/snowfoxHQ/dsh-vecrecall/issues"
   },
   "type": "module",
   "main": "./lib/index.js",
