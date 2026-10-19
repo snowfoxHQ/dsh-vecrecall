@@ -7,7 +7,7 @@
  */
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
-import type { VecRecallBridge } from './bridge.ts'
+import type { VecRecallBridge } from './bridge.js'
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json }
 

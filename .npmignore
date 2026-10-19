@@ -1,0 +1,12 @@
+# npm 优先使用 .npmignore；一旦存在，.gitignore 就会被忽略。
+# 这里刻意不排除 lib/ —— 那是要随包发布的构建产物。
+node_modules/
+scratch/
+*.tgz
+*.log
+.DS_Store
+.env
+.vscode/
+.idea/
+coverage/
+__pycache__/

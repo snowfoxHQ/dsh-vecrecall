@@ -9,8 +9,8 @@ import type { Context } from '@deepseek-ai/cordis'
 import Schema from '@deepseek-ai/schemastery'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { createBridge, type Embedder } from './bridge.ts'
-import { registerVecRecallTools, type ToolSettings } from './tools.ts'
+import { createBridge, type Embedder } from './bridge.js'
+import { registerVecRecallTools, type ToolSettings } from './tools.js'
 
 export const name = 'vecrecall'
 
