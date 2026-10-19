@@ -1,0 +1,60 @@
+{
+  "name": "dsh-vecrecall",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness plugin — give your agent persistent, four-layer cognitive memory backed by vecRecall.",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "agent-memory",
+    "long-term-memory",
+    "memory",
+    "rag",
+    "semantic-search"
+  ],
+  "license": "MIT",
+  "author": "snowfoxHQ",
+  "homepage": "https://github.com/snowfoxHQ/vecRecall-plugin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snowfoxHQ/vecRecall-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/snowfoxHQ/vecRecall-plugin/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.1-rc.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1-rc.1",
+    "@deepseek-ai/dsh-tools": "^0.0.1-rc.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.5",
+    "@deepseek-ai/dsh-tools": "^0.0.1-rc.1",
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

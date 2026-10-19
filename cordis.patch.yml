@@ -1,0 +1,4 @@
+- insert:
+    - id: vecrecall
+      name: 'dsh-vecrecall'
+      config: {}

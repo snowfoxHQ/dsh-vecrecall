@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tgz
+*.log
+.DS_Store
+.env
+.vscode/
+.idea/
+__pycache__/
+*.egg-info/
+coverage/
