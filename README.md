@@ -17,11 +17,8 @@ tool calls cost milliseconds instead of reloading weights every time.
 pip install "vecrecall @ git+https://github.com/snowfoxHQ/vecRecall.git"
 
 # 2. Mount the plugin into a dsh profile
-dsh plugin --profile web add github:snowfoxHQ/dsh-vecrecall
+dsh plugin --profile web add dsh-vecrecall
 ```
-
-Add `--allow-builds` if your dsh version asks you to trust the package before it mounts
-(the plugin ships TypeScript sources and has no build step).
 
 Then restart that profile. The tools appear as `vecrecall_*`.
 

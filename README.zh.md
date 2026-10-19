@@ -16,10 +16,8 @@
 pip install "vecrecall @ git+https://github.com/snowfoxHQ/vecRecall.git"
 
 # 2. 挂载插件到某个 dsh profile
-dsh plugin --profile web add github:snowfoxHQ/dsh-vecrecall
+dsh plugin --profile web add dsh-vecrecall
 ```
-
-若你的 dsh 版本要求在挂载前信任该包，加 `--allow-builds`（本插件为 TypeScript 源码，无构建步骤）。
 
 重启该 profile，工具即以 `vecrecall_*` 形式出现。
 
