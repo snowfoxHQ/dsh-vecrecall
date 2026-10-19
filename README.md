@@ -71,7 +71,7 @@ never exposed on a network interface. Your memory store is plain files under `da
 | Verified against | `@deepseek-ai/cordis` 4.0.5, `@deepseek-ai/dsh-tools` 0.0.1-rc.1 |
 | Type check | `npm run check` passes (strict, erasable-syntax-only) |
 | Runtime | Python bridge smoke-tested end to end: cold start ~23s, then 20–120ms per call |
-| Live harness run | not yet — feedback and issue reports welcome |
+| Live harness run | verified on DSH 0.2.1-rc.2 (desktop app): tools registered, memory written and read back |
 
 ## Troubleshooting
 

@@ -69,7 +69,7 @@ dsh plugin --profile web add dsh-vecrecall
 | 验证对象 | `@deepseek-ai/cordis` 4.0.5，`@deepseek-ai/dsh-tools` 0.0.1-rc.1 |
 | 类型检查 | `npm run check` 通过（strict + erasable-syntax-only） |
 | 运行时 | Python 桥接已端到端冒烟：冷启动约 23 秒，之后每次调用 20–120ms |
-| 真实 harness 实跑 | 尚未完成——欢迎反馈与提 issue |
+| 真实 harness 实跑 | 已在 DSH 0.2.1-rc.2（桌面端）验证：工具注册、记忆写入与读取回环均正常 |
 
 ## 排错
 
