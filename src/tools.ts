@@ -8,6 +8,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { VecRecallBridge } from './bridge.js'
+import { applyGuard, type SensitivePolicy } from './guard.js'
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json }
 
@@ -16,6 +17,8 @@ export interface ToolSettings {
   timeoutMs: number
   /** render 输出文本的最大字符数，超出截断。 */
   maxRenderChars: number
+  /** 命中疑似凭据时的处理方式：脱敏（默认）、拒绝、放行。 */
+  onSensitive: SensitivePolicy
 }
 
 // ── JSON 安全取值 ───────────────────────────
@@ -68,7 +71,7 @@ export function registerVecRecallTools(
   bridge: VecRecallBridge,
   settings: ToolSettings,
 ): (() => void)[] {
-  const { timeoutMs, maxRenderChars } = settings
+  const { timeoutMs, maxRenderChars, onSensitive } = settings
 
   // 1. 写入记忆
   const remember = defineTool({
@@ -77,7 +80,8 @@ export function registerVecRecallTools(
       'Persist a durable memory. Store stable, reusable facts verbatim — user preferences, ' +
       'decisions with rationale, project conventions, people, constraints. Do NOT store ' +
       'transient tool output, whole files, or anything derivable from the repo by reading it. ' +
-      'Content is deduplicated by meaning: near-identical memories merge instead of duplicating.',
+      'Content is deduplicated by meaning: near-identical memories merge instead of duplicating. ' +
+      'Credentials (connection strings, passwords, API keys) are stripped before storage.',
     parameters: {
       content: {
         type: 'string',
@@ -113,6 +117,9 @@ export function registerVecRecallTools(
               'importance',
               'wing',
               'dedupHint',
+              'redacted',
+              'redactNote',
+              'reason',
             ]),
             maxRenderChars,
           ),
@@ -120,9 +127,30 @@ export function registerVecRecallTools(
       ],
     },
     timeoutMs,
-    async execute(args) {
+    // 两个分支返回完全相同的字段集，避免联合类型被归一化出 `?: undefined`。
+    async execute(args): Promise<Json> {
+      // 凭据一旦入库就无从补救（明文存储 + 明文嵌入才能检索），所以拦在写入前。
+      const guard = applyGuard(args.content, onSensitive)
+      if (guard.kinds.length > 0 && onSensitive === 'reject') {
+        return {
+          ok: false,
+          id: null,
+          shortId: null,
+          topic: null,
+          importance: null,
+          wing: null,
+          dedupHint: null,
+          redacted: null,
+          redactNote: null,
+          reason:
+            `Refused: content looks like it contains ${guard.kinds.join(', ')}. ` +
+            'Strip the secret and retry, or record only the variable name (e.g. DB_URL).',
+          kinds: guard.kinds,
+        } satisfies Json
+      }
+
       const body: Record<string, unknown> = {
-        content: args.content,
+        content: guard.content,
         topic: args.topic ?? 'general',
       }
       if (args.wing) body.wing = args.wing
@@ -141,6 +169,14 @@ export function registerVecRecallTools(
         wing: str(rec.wing) ?? '',
         dedupHint:
           'Deduplication is on: if this id matches an existing memory, it was merged rather than added.',
+        redacted: guard.kinds.length > 0 ? guard.kinds : null,
+        redactNote:
+          guard.kinds.length > 0
+            ? 'Secret-looking parts were replaced with *** before storage. ' +
+              'The rest of the memory was kept, so it stays searchable.'
+            : null,
+        reason: null,
+        kinds: null,
       } satisfies Json
     },
   })

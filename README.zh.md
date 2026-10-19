@@ -52,6 +52,7 @@ dsh plugin --profile web add dsh-vecrecall
         startupTimeoutMs: 120000     # 首次启动要加载嵌入模型
         toolTimeoutMs: 120000
         maxRenderChars: 8000         # 限制工具输出长度，保护上下文窗口
+        onSensitive: redact       # redact | reject | allow，见下方「凭据防护」
 ```
 
 `embedder: 'bow'` 无需任何额外依赖且完全离线；`'auto'` 会在装了 sentence-transformers 时
@@ -61,6 +62,25 @@ dsh plugin --profile web add dsh-vecrecall
 
 辅助服务只监听 `127.0.0.1`，并要求携带每次进程启动时随机生成的 bearer token，
 不会暴露到网络接口。记忆本身是 `dataDir` 下的普通文件。
+
+### 凭据防护
+
+记忆以明文存储，而检索必须对明文做嵌入 —— 凭据一旦入库就无法事后补救，
+加密则等于放弃检索。唯一可靠的时机是写入之前，因此写入前会先做筛查：
+
+| `onSensitive` | 行为 |
+| --- | --- |
+| `redact`（默认） | 把凭据部分替换为 `***`，其余保留 |
+| `reject` | 拒绝写入，并提示模型去掉敏感值 |
+| `allow` | 原样写入（不推荐） |
+
+脱敏保留可检索的语义：`postgres://app:s3cret@db.internal:5432/hestia`
+会被存成 `postgres://app:***@db.internal:5432/hestia`，「数据库在哪台机器」照样能召回，
+而密码永不落盘。
+
+这是模式匹配，不是数学意义上的完备保证 —— 无法识别没有关键词上下文的裸密码。
+治本之策在上游：凭据放环境变量或 vault，让 agent 只引用变量名（`DB_URL`）。
+同样的护栏在 vecRecall 引擎内也有一份，CLI 与技能的写入同样受保护。
 
 ## 兼容性
 

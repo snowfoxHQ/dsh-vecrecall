@@ -54,6 +54,7 @@ Every field below has a working default; override only what you need in `cordis.
         startupTimeoutMs: 120000     # first start loads the embedding model
         toolTimeoutMs: 120000
         maxRenderChars: 8000         # cap rendered output to protect the context window
+        onSensitive: redact       # redact | reject | allow; see "Credentials" below
 ```
 
 `embedder: 'bow'` needs nothing extra and works fully offline; `'auto'` picks sentence-transformers
@@ -63,6 +64,27 @@ when installed and silently falls back to bag-of-words otherwise.
 
 The helper service listens on `127.0.0.1` only and requires a random per-process bearer token. It is
 never exposed on a network interface. Your memory store is plain files under `dataDir`.
+
+### Credentials
+
+Memories are stored as plain text, and retrieval requires embedding the plain text — so once a
+secret lands in the store there is no way to recover. Encrypting it would mean giving up search.
+The only reliable moment to act is before the write, so content is screened first:
+
+| `onSensitive` | Behaviour |
+| --- | --- |
+| `redact` (default) | Replaces credential parts with `***`, keeps the rest |
+| `reject` | Refuses the write and tells the model to strip the secret |
+| `allow` | Stores content as-is (not recommended) |
+
+Redaction preserves the retrievable meaning: `postgres://app:s3cret@db.internal:5432/hestia` is
+stored as `postgres://app:***@db.internal:5432/hestia`, so "which host is the database on" still
+recalls, while the password never touches disk.
+
+This is pattern matching, not a mathematical guarantee — it will not catch a bare password with no
+keyword context. The durable fix is upstream: keep credentials in env vars or a vault, and let the
+agent reference only the variable name (`DB_URL`). The same guard runs inside the vecRecall engine,
+so CLI and skill writes are covered too.
 
 ## Compatibility
 

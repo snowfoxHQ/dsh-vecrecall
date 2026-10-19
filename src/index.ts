@@ -10,6 +10,7 @@ import Schema from '@deepseek-ai/schemastery'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { createBridge, type Embedder } from './bridge.js'
+import type { SensitivePolicy } from './guard.js'
 import { registerVecRecallTools, type ToolSettings } from './tools.js'
 
 export const name = 'vecrecall'
@@ -38,6 +39,8 @@ export interface Config {
   toolTimeoutMs: number
   /** Cap on rendered tool output characters, protecting the context window. */
   maxRenderChars: number
+  /** What to do when memory content looks like a credential. */
+  onSensitive: SensitivePolicy
 }
 
 export const Config: Schema<Config> = Schema.object({
@@ -51,6 +54,7 @@ export const Config: Schema<Config> = Schema.object({
   startupTimeoutMs: Schema.number().default(120_000),
   toolTimeoutMs: Schema.number().default(120_000),
   maxRenderChars: Schema.number().default(8_000),
+  onSensitive: Schema.union(['allow', 'redact', 'reject'] as const).default('redact'),
 })
 
 export function apply(ctx: Context, config: Config): void {
@@ -70,6 +74,7 @@ export function apply(ctx: Context, config: Config): void {
   const settings: ToolSettings = {
     timeoutMs: config.toolTimeoutMs,
     maxRenderChars: config.maxRenderChars,
+    onSensitive: config.onSensitive,
   }
 
   // Registering tools inside an effect keeps their disposers owned by this
